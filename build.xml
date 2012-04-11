@@ -1,0 +1,53 @@
+<?xml version="1.0"?>
+
+<project name="stb" default="dist" basedir=".">
+	<property name="src" location="src"/>
+	<property name="build" location="build"/>
+	<property name="lib" location="lib"/>
+	<property name="dist" location="dist"/>
+
+	<target name="compile"> 
+		<mkdir dir="${build}"/>
+
+		<tstamp/>
+
+		<javac srcdir="${src}" destdir="${build}" debug="on" optimize="on" source="1.6">
+			<sourcepath>
+				<pathelement path="${build}"/>
+			</sourcepath>
+			<classpath>
+				<pathelement location="${lib}/h2-1.3.164.jar"/>
+			</classpath>
+		</javac>
+		
+		
+		<copy todir="${build}">
+			<fileset dir="${src}">
+				<exclude name="**/*.java" />
+			</fileset>
+		</copy>
+
+		<unzip dest="${build}">
+		    	<patternset>
+		        	<include name="**/*.class"/>
+			</patternset>
+    			<fileset dir=".">
+        			<include name="lib/*.jar"/>
+			</fileset>
+		</unzip>
+
+	</target>
+
+	<target name="dist" depends="compile">
+		<mkdir dir="${dist}"/>
+		<jar jarfile="${dist}/h2graph.jar" basedir="${build}">
+		</jar>
+	</target>
+
+	<target name="clean">
+		<delete includeEmptyDirs="true">
+			<fileset dir="${build}" />
+		</delete>
+		<delete dir="${dist}"/>
+	</target>
+</project>
