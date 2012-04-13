@@ -223,7 +223,6 @@ public class H2DB {
 			edges.add(edge);
 		}
 
-		System.out.println("Number of edges retrieved: "  + results);
 		return edges;
 	}
 
