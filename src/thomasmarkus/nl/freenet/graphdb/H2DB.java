@@ -116,6 +116,20 @@ public class H2DB {
 		throw new SQLException("Could not retrieve latest vertices.id");
 	}
 
+	public List<Long> getAllVerticesWithProperty(String name) throws SQLException
+	{
+		PreparedStatement statement = con.prepareStatement("SELECT DISTINCT vertex_id FROM vertex_properties WHERE name = ?");
+		statement.setString(1, name);
+		ResultSet resultSet = statement.executeQuery();
+		
+		List<Long> result = new LinkedList<Long>();
+		while(resultSet.next())
+		{
+			result.add(resultSet.getLong("vertex_id"));
+		}
+		return result;
+	}
+	
 	public void insertVertexProperty(long vertex_id, String name, String value) throws SQLException
 	{
 		PreparedStatement ps = con.prepareStatement("INSERT INTO vertex_properties (vertex_id, name, value, value_number) VALUES (?, ?, ?, ?)");

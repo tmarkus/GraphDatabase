@@ -2,6 +2,7 @@ package thomasmarkus.nl.freenet.graphdb;
 
 import java.sql.*;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 public class Core {
@@ -14,7 +15,7 @@ public class Core {
 	public static void main(String[] args) throws ClassNotFoundException, SQLException {
 
 		
-		H2Graph graph = new H2Graph("~/Freenet/LCWoT");
+		H2Graph graph = new H2Graph("Testing");
 
 		String ownIdentityID = "zALLY9pbzMNicVn280HYqS2UkK0ZfX5LiTcln-cLrMU,GoLpCcShPzp3lbQSVClSzY7CH9c9HTw0qRLifBYqywY,AQACAAE";
 		graph.getVertexByPropertyValue("id", ownIdentityID);
@@ -32,6 +33,10 @@ public class Core {
 		graph.getOutgoingEdgesWithProperty(1, "score");
 		System.out.println(System.currentTimeMillis()-start);
 		
+		
+		List<Long> result = graph.getAllVerticesWithProperty("id");
+		
+		System.out.println("number of results: " + result);
 		
 		graph.shutdown();
 		

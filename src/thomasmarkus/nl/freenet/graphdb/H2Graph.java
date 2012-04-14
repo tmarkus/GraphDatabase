@@ -19,6 +19,11 @@ public class H2Graph {
 		return db.insertVertex();
 	}
 	
+	public List<Long> getAllVerticesWithProperty(String name) throws SQLException
+	{
+		return db.getAllVerticesWithProperty(name);
+	}
+	
 	public void addVertexProperty(long vertex_id, String name, String value) throws SQLException
 	{
 		db.insertVertexProperty(vertex_id, name, value);
