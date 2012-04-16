@@ -110,6 +110,11 @@ public class H2Graph {
 		db.removeVertex(vertex_id);
 	}
 	
+	public void removePropertyForAllVertices(String name) throws SQLException
+	{
+		db.removePropertyForAllVertices(name);
+	}
+	
 	public void removeVertexProperty(long vertex_id, String name) throws SQLException
 	{
 		db.removeVertexProperty(vertex_id, name);

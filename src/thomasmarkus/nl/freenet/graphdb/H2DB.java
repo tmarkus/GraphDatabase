@@ -407,6 +407,13 @@ public class H2DB {
 		ps.execute();
 	}
 	
+	public void removePropertyForAllVertices(String name) throws SQLException
+	{
+		PreparedStatement ps = con.prepareStatement("DELETE FROM vertex_properties WHERE name = ?");
+		ps.setString(1, name);
+		ps.execute();
+	}
+	
 	public void removeVertexProperty(long vertex_id, String name) throws SQLException
 	{
 		PreparedStatement ps = con.prepareStatement("DELETE FROM vertex_properties WHERE vertex_id = ? AND name = ?");
