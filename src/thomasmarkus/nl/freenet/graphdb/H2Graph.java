@@ -34,7 +34,7 @@ public class H2Graph {
 		return db.getVertexProperties(vertex_id);
 	}
 	
-	public Map<String, List<String>> getEdeProperties(long edge_id) throws SQLException
+	public Map<String, List<String>> getEdgeProperties(long edge_id) throws SQLException
 	{
 		return db.getEdgeProperties(edge_id);
 	}
@@ -103,6 +103,11 @@ public class H2Graph {
 	public long getEdgeByVerticesAndProperty(long vertex_from, long vertex_to, String name) throws SQLException
 	{
 		return db.getEdgeByVerticesAndProperty(vertex_from, vertex_to, name);
+	}
+
+	public String getEdgeValueByVerticesAndProperty(long vertex_from, long vertex_to, String name) throws SQLException
+	{
+		return db.getEdgeValueByVerticesAndProperty(vertex_from, vertex_to, name);
 	}
 	
 	public void removeVertex(long vertex_id) throws SQLException

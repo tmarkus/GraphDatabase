@@ -336,6 +336,25 @@ public class H2DB {
 			throw new SQLException("Could not retrieve edge with these vertices and property name");
 		}
 	}
+
+	public String getEdgeValueByVerticesAndProperty(long vertex_from, long vertex_to, String name) throws SQLException
+	{
+		PreparedStatement ps = con.prepareStatement("SELECT value FROM edge_properties, edges WHERE vertex_from_id = ? AND vertex_to_id = ? AND name = ? AND edge_id = edges.id");
+		ps.setLong(1, vertex_from);
+		ps.setLong(2, vertex_to);
+		ps.setString(3, name);
+
+		ResultSet results = ps.executeQuery();
+		if (results.next())
+		{
+			return results.getString("value");
+		}
+		else
+		{
+			throw new SQLException("Could not retrieve edge value with these vertices and property name");
+		}
+	}
+
 	
 	
 	public List<Long> getVertex(String name, String value) throws SQLException
