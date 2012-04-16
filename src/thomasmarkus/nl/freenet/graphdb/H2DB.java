@@ -105,11 +105,11 @@ public class H2DB {
         con.close();
 	}
 
-	public long insertVertex() throws SQLException
+	public synchronized long insertVertex() throws SQLException
 	{
 		Statement st = con.createStatement();
 		st.executeUpdate("INSERT into vertices () VALUES () ", Statement.RETURN_GENERATED_KEYS);
-		ResultSet results = st.getGeneratedKeys();
+		ResultSet results = st.executeQuery("SELECT MAX(id) FROM vertices"); 
 		
 		if (results.next())
 		{
@@ -406,7 +406,7 @@ public class H2DB {
 	}
 	
 	
-	public long insertEdge(long vertex_from_id, long vertex_to_id) throws SQLException {
+	public synchronized long insertEdge(long vertex_from_id, long vertex_to_id) throws SQLException {
 
 		final PreparedStatement ps = con.prepareStatement("INSERT INTO edges (vertex_from_id, vertex_to_id) VALUES (?, ?)", PreparedStatement.RETURN_GENERATED_KEYS);
 		
@@ -414,7 +414,8 @@ public class H2DB {
 		ps.setLong(2, vertex_to_id);
 		ps.executeUpdate();
 
-		final ResultSet results = ps.getGeneratedKeys();
+		ResultSet results =  con.createStatement().executeQuery("SELECT MAX(id) FROM edges"); 
+
 		if (results.next())
 		{
 			return results.getLong(1);	
