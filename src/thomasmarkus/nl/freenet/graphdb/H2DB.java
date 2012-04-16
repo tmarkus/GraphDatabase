@@ -105,14 +105,17 @@ public class H2DB {
         con.close();
 	}
 
-	public synchronized long insertVertex() throws SQLException
+	public long insertVertex() throws SQLException
 	{
-		con.createStatement().execute("INSERT into vertices () VALUES () ");
-		ResultSet results = con.createStatement().executeQuery("SELECT id FROM vertices ORDER BY id DESC LIMIT 1");
+		Statement st = con.createStatement();
+		st.executeUpdate("INSERT into vertices () VALUES () ", Statement.RETURN_GENERATED_KEYS);
+		ResultSet results = st.getGeneratedKeys();
+		
 		if (results.next())
 		{
-			return results.getLong("id");	
+			return results.getLong(1); 	
 		}
+
 		throw new SQLException("Could not retrieve latest vertices.id");
 	}
 
@@ -384,25 +387,26 @@ public class H2DB {
 	}
 	
 	
-	public synchronized long insertEdge(long vertex_from_id, long vertex_to_id) throws SQLException {
+	public long insertEdge(long vertex_from_id, long vertex_to_id) throws SQLException {
 
-		PreparedStatement ps = con.prepareStatement("INSERT INTO edges (vertex_from_id, vertex_to_id) VALUES (?, ?)");
+		final PreparedStatement ps = con.prepareStatement("INSERT INTO edges (vertex_from_id, vertex_to_id) VALUES (?, ?)", PreparedStatement.RETURN_GENERATED_KEYS);
+		
 		ps.setLong(1, vertex_from_id);
 		ps.setLong(2, vertex_to_id);
-		ps.execute();
-	
-		ResultSet results = con.createStatement().executeQuery("SELECT id FROM edges ORDER BY id DESC LIMIT 1");
+		ps.executeUpdate();
+
+		final ResultSet results = ps.getGeneratedKeys();
 		if (results.next())
 		{
-			return results.getLong("id");	
+			return results.getLong(1);	
 		}
-		throw new SQLException("Could not retrieve latest vertices.id");
+		throw new SQLException("Could not retrieve latest edges.id");
 
 	}
 
 	public void removeVertex(long vertex_id) throws SQLException
 	{
-		PreparedStatement ps = con.prepareStatement("DELETE FROM vertices WHERE id = ?");
+		final PreparedStatement ps = con.prepareStatement("DELETE FROM vertices WHERE id = ?");
 		ps.setLong(1, vertex_id);
 		ps.execute();
 	}

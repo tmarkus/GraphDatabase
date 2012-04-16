@@ -5,7 +5,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public class Core {
+public class Test {
 
 	/**
 	 * @param args
@@ -32,7 +32,12 @@ public class Core {
 		long start = System.currentTimeMillis();
 		graph.getOutgoingEdgesWithProperty(1, "score");
 		System.out.println(System.currentTimeMillis()-start);
+
+		long id = graph.createVertex();
+		System.out.println("id = " + id);
 		
+		long edge_id = graph.addEdge(1, 2);
+		System.out.println("edge_id = " + edge_id);
 		
 		List<Long> result = graph.getAllVerticesWithProperty("id");
 		

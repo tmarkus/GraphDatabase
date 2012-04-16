@@ -1,7 +1,6 @@
 package thomasmarkus.nl.freenet.graphdb;
 
 import java.sql.SQLException;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
