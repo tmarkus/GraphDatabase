@@ -6,26 +6,27 @@ import org.h2.jdbcx.JdbcConnectionPool;
 
 public class H2GraphFactory {
 
-	private JdbcConnectionPool cp;
+	private final JdbcConnectionPool cp;
 	
 	public H2GraphFactory(String dbname) throws ClassNotFoundException, SQLException
 	{
 		//open the database
         Class.forName("org.h2.Driver");
-		cp = JdbcConnectionPool.create("jdbc:h2:"+dbname, "sa", "");
-        cp.setMaxConnections(20);
+		this.cp = JdbcConnectionPool.create("jdbc:h2:"+dbname+";LOCK_MODE=1", "sa", "");
+        this.cp.setMaxConnections(20);
         
-        H2DB.checkDB(cp.getConnection());
+        H2DB.checkDB(this.cp.getConnection());
 	}
 	
 	public H2Graph getGraph() throws SQLException
 	{
-		return new H2Graph(cp.getConnection());
+		return new H2Graph(this.cp.getConnection());
 	}
 	
 	public void stop()
 	{
-		cp.dispose();
+		this.cp.dispose();
+		
 	}
 	
 }
