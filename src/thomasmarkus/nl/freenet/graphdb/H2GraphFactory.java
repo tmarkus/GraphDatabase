@@ -14,7 +14,6 @@ public class H2GraphFactory {
         Class.forName("org.h2.Driver");
 		this.cp = JdbcConnectionPool.create("jdbc:h2:"+dbname+";LOCK_MODE=1", "sa", "");
         this.cp.setMaxConnections(20);
-        
         H2DB.checkDB(this.cp.getConnection());
 	}
 	

@@ -12,7 +12,8 @@ public class H2Graph {
 	
 	public H2Graph(Connection con)
 	{
-			db = new H2DB(con);
+		this.con = con;	
+		db = new H2DB(con);
 	}
 	
 	public Connection getConnection()

@@ -11,8 +11,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import org.h2.jdbcx.JdbcConnectionPool;
-
 public class H2DB {
 
 	Connection con;
