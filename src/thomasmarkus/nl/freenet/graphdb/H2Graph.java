@@ -20,6 +20,17 @@ public class H2Graph {
 		return this.con;
 	}
 	
+	public void setAutoCommit(boolean enable) throws SQLException
+	{
+		this.con.setAutoCommit(enable);
+	}
+	
+	public void commit() throws SQLException
+	{
+		this.con.commit();
+	}
+	
+	
 	public long createVertex() throws SQLException
 	{
 		return db.insertVertex();
