@@ -30,6 +30,10 @@ public class H2Graph {
 		this.con.commit();
 	}
 	
+	public void close() throws SQLException
+	{
+		this.con.close();
+	}
 	
 	public long createVertex() throws SQLException
 	{
