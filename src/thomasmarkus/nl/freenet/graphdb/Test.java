@@ -16,8 +16,8 @@ public class Test {
 	 */
 	public static void main(String[] args) throws ClassNotFoundException, SQLException {
 
-		
-		graph = new H2Graph("Testing");
+		final H2GraphFactory gf = new H2GraphFactory("Testing");
+		graph = gf.getGraph();
 
 		String ownIdentityID = "zALLY9pbzMNicVn280HYqS2UkK0ZfX5LiTcln-cLrMU,GoLpCcShPzp3lbQSVClSzY7CH9c9HTw0qRLifBYqywY,AQACAAE";
 		graph.getVertexByPropertyValue("id", ownIdentityID);
@@ -40,16 +40,19 @@ public class Test {
 		{
 			public void run()
 			{
-				System.out.println("Adding some vertices...");
-				for(int i=0; i < 100000; i++)
+				try
 				{
-					long edge_id;
-					try {
+					H2Graph graph = gf.getGraph();
+					System.out.println("Adding some vertices...");
+					for(int i=0; i < 100000; i++)
+					{
+						long edge_id;
 						edge_id = graph.addEdge(1, 2);
-					} catch (SQLException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
 					}
+				}
+				catch(SQLException e)
+				{
+					
 				}
 			}
 		});

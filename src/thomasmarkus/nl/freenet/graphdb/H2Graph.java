@@ -1,17 +1,23 @@
 package thomasmarkus.nl.freenet.graphdb;
 
+import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 
 public class H2Graph {
 
-
 	H2DB db;
+	Connection con;
 	
-	public H2Graph(String dbname) throws ClassNotFoundException, SQLException
+	public H2Graph(Connection con)
 	{
-			db = new H2DB(dbname);
+			db = new H2DB(con);
+	}
+	
+	public Connection getConnection()
+	{
+		return this.con;
 	}
 	
 	public long createVertex() throws SQLException
