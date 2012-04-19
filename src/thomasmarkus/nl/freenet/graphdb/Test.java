@@ -17,6 +17,13 @@ public class Test {
 	public static void main(String[] args) throws ClassNotFoundException, SQLException {
 
 		final H2GraphFactory gf = new H2GraphFactory("Testing");
+		
+		for(int i = 0; i < 1000; i++)
+		{
+			System.out.println(i);
+			graph = gf.getGraph();
+		}
+		
 		graph = gf.getGraph();
 
 		String ownIdentityID = "zALLY9pbzMNicVn280HYqS2UkK0ZfX5LiTcln-cLrMU,GoLpCcShPzp3lbQSVClSzY7CH9c9HTw0qRLifBYqywY,AQACAAE";

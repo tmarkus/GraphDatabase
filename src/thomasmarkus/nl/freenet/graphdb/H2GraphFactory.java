@@ -23,8 +23,13 @@ public class H2GraphFactory {
 	{
 		//open the database
         Class.forName("org.h2.Driver");
-		this.cp = JdbcConnectionPool.create("jdbc:h2:"+dbname+";LOCK_MODE=1", "sa", "");
+		this.cp = JdbcConnectionPool.create("jdbc:h2:"+dbname+";LOCK_MODE=3;LOCK_TIMEOUT=30000", "sa", "");
         H2DB.checkDB(this.cp.getConnection());
+	}
+	
+	public int getActiveConnections()
+	{
+		return cp.getActiveConnections();
 	}
 	
 	public H2Graph getGraph() throws SQLException
