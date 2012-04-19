@@ -1,30 +1,30 @@
 package thomasmarkus.nl.freenet.graphdb;
 
+import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
 
 import org.h2.jdbcx.JdbcConnectionPool;
 
 public class H2GraphFactory {
 
 	private JdbcConnectionPool cp = null;
+	private Set<Connection> connections;
 	
 	public H2GraphFactory(String dbname) throws ClassNotFoundException, SQLException
 	{
-		setup(dbname);
+        Class.forName("org.h2.Driver");
+		this.cp = JdbcConnectionPool.create("jdbc:h2:"+dbname+";LOCK_MODE=3;LOCK_TIMEOUT=30000", "sa", "");
+        this.connections = new HashSet<Connection>();
+		H2DB.checkDB(this.cp.getConnection());
 	}
 	
 	public H2GraphFactory(String dbname, int max_connections) throws ClassNotFoundException, SQLException
 	{
-        setup(dbname);
+        this(dbname);
 		this.cp.setMaxConnections(max_connections);
-	}
-	
-	private void setup(String dbname) throws ClassNotFoundException, SQLException
-	{
-		//open the database
-        Class.forName("org.h2.Driver");
-		this.cp = JdbcConnectionPool.create("jdbc:h2:"+dbname+";LOCK_MODE=3;LOCK_TIMEOUT=30000", "sa", "");
-        H2DB.checkDB(this.cp.getConnection());
 	}
 	
 	public int getActiveConnections()
@@ -34,11 +34,37 @@ public class H2GraphFactory {
 	
 	public H2Graph getGraph() throws SQLException
 	{
-		return new H2Graph(this.cp.getConnection());
+		synchronized (connections) {
+			removeClosedConnections();
+			Connection con = this.cp.getConnection();
+			connections.add(con);
+			return new H2Graph(con);
+		}
 	}
 	
-	public void stop()
+	private void removeClosedConnections() throws SQLException
 	{
+		synchronized (connections) {
+			Iterator<Connection> iter = connections.iterator();
+			while(iter.hasNext())
+			{
+				Connection con = iter.next();
+				if (con.isClosed()) iter.remove();
+			}
+		}
+	}
+	
+	public void stop() throws SQLException
+	{
+		removeClosedConnections();
+
+		synchronized (connections) {
+			for(Connection con : connections)
+			{
+				con.close();
+			}
+		}
+		
 		this.cp.dispose();
 		
 	}
