@@ -49,7 +49,7 @@ public class H2DB {
 
 				stmt.execute(	"CREATE TABLE vertex_properties " +
 						" (" +
-						"	vertex_id LONG, name VARCHAR(255), value VARCHAR(255), value_number INT" +
+						"	vertex_id LONG, name VARCHAR(256), value VARCHAR(256), value_number INT" +
 						")"
 						); 
 
@@ -60,7 +60,7 @@ public class H2DB {
 
 				stmt.execute(	"CREATE TABLE edge_properties " +
 						" (" +
-						"	edge_id LONG, name VARCHAR(255), value VARCHAR(255), value_number INT " +
+						"	edge_id LONG, name VARCHAR(256), value VARCHAR(256), value_number INT " +
 						")"
 						); 
 
