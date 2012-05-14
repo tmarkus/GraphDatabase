@@ -164,12 +164,33 @@ public class H2DB {
 
 	public void updateEdgeProperty(long edge_id, String name, String value) throws SQLException
 	{
-		final PreparedStatement ps = con.prepareStatement("DELETE FROM edge_properties WHERE edge_id = ? AND name = ?");
-		ps.setLong(1, edge_id);
-		ps.setString(2, name);
-		ps.execute();
-		insertEdgeProperty(edge_id, name, value);
-		ps.close();
+		PreparedStatement ps_select = con.prepareStatement("SELECT FROM edge_properties WHERE edge_id = ? AND name = ?");
+		ps_select.setLong(1, edge_id);
+		ps_select.setString(2, name);	
+		
+		ResultSet result = ps_select.executeQuery();
+		
+		try
+		{
+			if (result.next()) //update
+			{
+				PreparedStatement ps_update = con.prepareStatement("UPDATE edge_properties SET value = ? WHERE name = ? AND edge_id = ?;");
+				ps_update.setString(1, value);
+				ps_update.setString(2, name);	
+				ps_update.setLong(3, edge_id);
+				ps_update.execute();
+				ps_update.close();
+			}
+			else //insert
+			{
+				insertEdgeProperty(edge_id, name, value);
+			}
+		}
+		finally
+		{
+			ps_select.close();
+			result.close();
+		}
 	}
 
 	public void insertEdgeProperty(long edge_id, String name, String value) throws SQLException
