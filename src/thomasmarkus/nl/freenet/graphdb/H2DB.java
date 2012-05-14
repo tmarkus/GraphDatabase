@@ -153,13 +153,34 @@ public class H2DB {
 
 	public void updateVertexProperty(long vertex_id, String name, String value) throws SQLException
 	{
-		final PreparedStatement ps = con.prepareStatement("DELETE FROM vertex_properties WHERE vertex_id = ? AND name = ?");
-		ps.setLong(1, vertex_id);
-		ps.setString(2, name);
-		ps.execute();
 
-		insertVertexProperty(vertex_id, name, value);
-		ps.close();
+		PreparedStatement ps_select = con.prepareStatement("SELECT FROM vertex_properties WHERE vertex_id = ? AND name = ?");
+		ps_select.setLong(1, vertex_id);
+		ps_select.setString(2, name);	
+		
+		ResultSet result = ps_select.executeQuery();
+		
+		try
+		{
+			if (result.next()) //update
+			{
+				PreparedStatement ps_update = con.prepareStatement("UPDATE vertex_properties SET value = ? WHERE name = ? AND vertex_id = ?;");
+				ps_update.setString(1, value);
+				ps_update.setString(2, name);	
+				ps_update.setLong(3, vertex_id);
+				ps_update.execute();
+				ps_update.close();
+			}
+			else //insert
+			{
+				insertVertexProperty(vertex_id, name, value);
+			}
+		}
+		finally
+		{
+			ps_select.close();
+			result.close();
+		}
 	}
 
 	public void updateEdgeProperty(long edge_id, String name, String value) throws SQLException
