@@ -154,7 +154,7 @@ public class H2DB {
 	public void updateVertexProperty(long vertex_id, String name, String value) throws SQLException
 	{
 
-		PreparedStatement ps_select = con.prepareStatement("SELECT FROM vertex_properties WHERE vertex_id = ? AND name = ?");
+		PreparedStatement ps_select = con.prepareStatement("EXISTS (SELECT * FROM vertex_properties WHERE vertex_id = ? AND name = ?)");
 		ps_select.setLong(1, vertex_id);
 		ps_select.setString(2, name);	
 		
@@ -185,7 +185,7 @@ public class H2DB {
 
 	public void updateEdgeProperty(long edge_id, String name, String value) throws SQLException
 	{
-		PreparedStatement ps_select = con.prepareStatement("SELECT FROM edge_properties WHERE edge_id = ? AND name = ?");
+		PreparedStatement ps_select = con.prepareStatement("EXISTS (SELECT * FROM edge_properties WHERE edge_id = ? AND name = ?)");
 		ps_select.setLong(1, edge_id);
 		ps_select.setString(2, name);	
 		
