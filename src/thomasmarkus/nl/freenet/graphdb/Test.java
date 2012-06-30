@@ -1,8 +1,11 @@
 package thomasmarkus.nl.freenet.graphdb;
 
 import java.sql.*;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 public class Test {
@@ -16,27 +19,12 @@ public class Test {
 	 */
 	public static void main(String[] args) throws ClassNotFoundException, SQLException {
 
-		final H2GraphFactory gf = new H2GraphFactory("Testing");
-		
-		for(int i = 0; i < 1000; i++)
-		{
-			System.out.println(i);
-			graph = gf.getGraph();
-		}
+		final H2GraphFactory gf = new H2GraphFactory("~/Freenet/LCWoT");
 		
 		graph = gf.getGraph();
 
 		String ownIdentityID = "zALLY9pbzMNicVn280HYqS2UkK0ZfX5LiTcln-cLrMU,GoLpCcShPzp3lbQSVClSzY7CH9c9HTw0qRLifBYqywY,AQACAAE";
 		graph.getVertexByPropertyValue("id", ownIdentityID);
-
-		Set<Long> pool = new HashSet<Long>(graph.getVertexByPropertyValue("id", ownIdentityID));
-		
-		
-		graph.getOutgoingEdgesWithProperty(0, "score");
-		graph.getOutgoingEdgesWithProperty(1, "score");
-		graph.getOutgoingEdgesWithProperty(2, "score");
-		graph.getOutgoingEdgesWithProperty(3, "score");
-		graph.getOutgoingEdgesWithProperty(4, "score");
 		
 		long start = System.currentTimeMillis();
 		graph.getOutgoingEdgesWithProperty(1, "score");
@@ -84,8 +72,8 @@ public class Test {
 		});
 
 		 
-		thread.start();
-		thread2.start();
+		//thread.start();
+		//thread2.start();
 		
 		
 		List<Long> result = graph.getAllVerticesWithProperty("id");
@@ -93,6 +81,38 @@ public class Test {
 		System.out.println("number of results: " + result);
 		
 		
+		
+		System.out.println("Trying smart query... ");
+		List<String> names = new LinkedList<String>();
+		names.add("trust.zALLY9pbzMNicVn280HYqS2UkK0ZfX5LiTcln-cLrMU");
+		
+		List<String> properties = new LinkedList<String>();
+		properties.add("name");
+		properties.add("edition");
+		
+		Map<String, String> requiredProperties = new HashMap<String, String>();
+		requiredProperties.put("contextName", "Sone");
+		requiredProperties.put("name", "digger3");
+		
+		long startTime = System.currentTimeMillis();
+		
+		VertexIterator resultIterator = graph.getVertices(names, -1, properties, requiredProperties, false, 100);
+		
+		System.out.println("This took: " + (System.currentTimeMillis() - startTime));
+		
+		
+		while(resultIterator.hasNext())
+		{
+			Map<String, List<String>> vertex = resultIterator.next();
+			
+			System.out.println(vertex.keySet());
+			System.out.println(vertex.get("name").get(0));
+			
+		}
+		
+		
+		graph.close();
+		gf.stop();
 		
 		//TODO: get vertices connected to some other vertex
 		//TODO: get edge via some property-name pair

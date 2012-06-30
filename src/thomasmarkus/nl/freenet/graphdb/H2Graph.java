@@ -2,8 +2,11 @@ package thomasmarkus.nl.freenet.graphdb;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class H2Graph {
 
@@ -60,8 +63,48 @@ public class H2Graph {
 	{
 		return db.getEdgeProperties(edge_id);
 	}
+
+	/**
+	 * @param names A list of property names that it will match disjunctively on
+	 * @param value Minimum value
+	 * @return An iterator for vertices with this property
+	 * @throws SQLException
+	 */
 	
-	public List<Long> getVerticesWithPropertyValueLargerThan(String name, long value) throws SQLException
+	public VertexIterator getVertices(List<String> names, int value, List<String> properties, Map<String, String> requiredProperties, boolean randomOrder, int limit) throws SQLException
+	{
+		return db.getVertices(names, value, properties, requiredProperties, randomOrder, limit);
+	}
+
+	public VertexIterator getVertices(String name, int value, String property) throws SQLException
+	{
+		List<String> names = new LinkedList<String>();
+		names.add(name);
+
+		List<String> properties = new LinkedList<String>();
+		names.add(property);
+
+		Map<String, String> requiredProperties = new HashMap<String, String>();
+		
+		return db.getVertices(names, value, properties, requiredProperties, false, Integer.MAX_VALUE);
+	}
+
+	public VertexIterator getVertices(String name, int value, String property, boolean randomOrder, int limit) throws SQLException
+	{
+		List<String> names = new LinkedList<String>();
+		names.add(name);
+
+		List<String> properties = new LinkedList<String>();
+		properties.add(property);
+
+		Map<String, String> requiredProperties = new HashMap<String, String>();
+		
+		return db.getVertices(names, value, properties, requiredProperties, false, Integer.MAX_VALUE);
+	}
+
+	
+	
+	public Set<Long> getVerticesWithPropertyValueLargerThan(String name, long value) throws SQLException
 	{
 		return db.getVertexWithPropertyValueLargerThan(name, value);
 	}

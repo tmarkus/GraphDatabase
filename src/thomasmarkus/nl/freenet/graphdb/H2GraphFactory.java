@@ -56,6 +56,12 @@ public class H2GraphFactory {
 	
 	public void stop() throws SQLException
 	{
+		//compact the database further
+		Connection compactConnection = this.cp.getConnection();
+		compactConnection.prepareStatement("ANALYZE").execute();
+		compactConnection.prepareStatement("SHUTDOWN COMPACT").execute();
+		compactConnection.close();
+		
 		removeClosedConnections();
 
 		synchronized (connections) {

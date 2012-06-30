@@ -7,9 +7,17 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
+
+import com.truemesh.squiggle.InCriteria;
+import com.truemesh.squiggle.MatchCriteria;
+import com.truemesh.squiggle.SelectQuery;
+import com.truemesh.squiggle.Table;
 
 public class H2DB {
 
@@ -26,7 +34,7 @@ public class H2DB {
 		{
 			final Statement stmt = con.createStatement();
 
-			//check whether it contains the right tables
+			//check whether it contains any tables
 			DatabaseMetaData dbm = con.getMetaData();
 			ResultSet tables = dbm.getTables(null, null, null, new String[] {"TABLE"});
 
@@ -154,7 +162,7 @@ public class H2DB {
 	public void updateVertexProperty(long vertex_id, String name, String value) throws SQLException
 	{
 
-		PreparedStatement ps_select = con.prepareStatement("EXISTS (SELECT * FROM vertex_properties WHERE vertex_id = ? AND name = ?)");
+		PreparedStatement ps_select = con.prepareStatement("SELECT * FROM vertex_properties WHERE vertex_id = ? AND name = ? LIMIT 1;");
 		ps_select.setLong(1, vertex_id);
 		ps_select.setString(2, name);	
 		
@@ -178,6 +186,7 @@ public class H2DB {
 		}
 		finally
 		{
+			insertVertexProperty(vertex_id, name, value);
 			ps_select.close();
 			result.close();
 		}
@@ -185,7 +194,7 @@ public class H2DB {
 
 	public void updateEdgeProperty(long edge_id, String name, String value) throws SQLException
 	{
-		PreparedStatement ps_select = con.prepareStatement("EXISTS (SELECT * FROM edge_properties WHERE edge_id = ? AND name = ?)");
+		PreparedStatement ps_select = con.prepareStatement("SELECT * FROM edge_properties WHERE edge_id = ? AND name = ? LIMIT 1");
 		ps_select.setLong(1, edge_id);
 		ps_select.setString(2, name);	
 		
@@ -209,6 +218,7 @@ public class H2DB {
 		}
 		finally
 		{
+			insertEdgeProperty(edge_id, name, value);
 			ps_select.close();
 			result.close();
 		}
@@ -473,13 +483,13 @@ public class H2DB {
 		return vertices;
 	}
 
-	public List<Long> getVertexWithPropertyValueLargerThan(String name, long value) throws SQLException
+	public Set<Long> getVertexWithPropertyValueLargerThan(String name, long value) throws SQLException
 	{
 		PreparedStatement ps = con.prepareStatement("SELECT vertex_id FROM vertex_properties WHERE name = ? AND value_number > ?");
 		ps.setString(1, name);
 		ps.setLong(2, value);
 
-		List<Long> vertices = new LinkedList<Long>();
+		Set<Long> vertices = new HashSet<Long>();
 		ResultSet results = ps.executeQuery();
 		while(results.next())
 		{
@@ -491,7 +501,54 @@ public class H2DB {
 
 		return vertices;
 	}
+	
+	public VertexIterator getVertices(List<String> ownIdentities, int value, List<String> properties, Map<String, String> requiredProperties, boolean randomOrder, int limit) throws SQLException 
+	{
+			final Table vertex_properties = new Table("vertex_properties");
+			final SelectQuery select = new SelectQuery(vertex_properties);
+			select.setDistinct(true);
+			select.addColumn(vertex_properties, "vertex_id");
+			select.addColumn(vertex_properties, "name");
+			select.addColumn(vertex_properties, "value");
+			
+			//required vertex properties
+			for(Entry<String, String> requiredProperty : requiredProperties.entrySet())
+			{
+				final SelectQuery subSelect = new SelectQuery(vertex_properties);
+				subSelect.setDistinct(true);
+				subSelect.addColumn(vertex_properties, "vertex_id");
+				subSelect.addCriteria(new MatchCriteria(vertex_properties, "name", MatchCriteria.EQUALS, requiredProperty.getKey()));
+				subSelect.addCriteria(new MatchCriteria(vertex_properties, "value", MatchCriteria.EQUALS, requiredProperty.getValue()));
 
+				select.addCriteria(new InCriteria(vertex_properties, "vertex_id", subSelect));	
+			}
+			
+			//required trust values
+			final SelectQuery subSelect = new SelectQuery(vertex_properties);
+			subSelect.setDistinct(true);
+			subSelect.addColumn(vertex_properties, "vertex_id");
+			subSelect.addCriteria(new InCriteria(vertex_properties, "name", ownIdentities));
+			subSelect.addCriteria(new MatchCriteria(vertex_properties, "value", MatchCriteria.GREATER, value));
+			select.addCriteria(new InCriteria(vertex_properties, "vertex_id", subSelect));	
+			
+			if (properties.size() > 0) select.addCriteria(new InCriteria(vertex_properties, "name", properties));
+			
+			if (!randomOrder) 	select.addOrder(vertex_properties, "vertex_id", true);
+			
+			String queryString = select.toString();
+			if (randomOrder)	{
+				queryString.replace(";"," ");
+				queryString += " ORDER BY RAND() ";
+			}
+			if (limit != Integer.MAX_VALUE) queryString += " LIMIT "+limit+";";
+			
+			System.out.println(queryString);
+			
+			PreparedStatement ps = con.prepareStatement(queryString);
+			ResultSet results = ps.executeQuery();
+			return new VertexIterator(results);
+	}
+	
 	/**
 	 * lookup the properties for this vertex and add them to the object
 	 * @param vertex_id
@@ -612,4 +669,6 @@ public class H2DB {
 			return -1l;
 		}
 	}
+
+	
 }
