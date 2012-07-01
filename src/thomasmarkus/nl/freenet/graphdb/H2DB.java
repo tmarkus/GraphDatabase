@@ -186,7 +186,6 @@ public class H2DB {
 		}
 		finally
 		{
-			insertVertexProperty(vertex_id, name, value);
 			ps_select.close();
 			result.close();
 		}
@@ -218,7 +217,6 @@ public class H2DB {
 		}
 		finally
 		{
-			insertEdgeProperty(edge_id, name, value);
 			ps_select.close();
 			result.close();
 		}
