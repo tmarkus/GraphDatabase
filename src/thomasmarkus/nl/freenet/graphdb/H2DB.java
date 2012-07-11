@@ -155,8 +155,14 @@ public class H2DB {
 			ps.setNull(4, java.sql.Types.INTEGER);
 		}
 
-		ps.execute();
-		ps.close();
+		try
+		{
+			ps.execute();
+		}
+		finally
+		{
+			ps.close();
+		}
 	}
 
 	public void updateVertexProperty(long vertex_id, String name, String value) throws SQLException
@@ -173,11 +179,18 @@ public class H2DB {
 			if (result.next()) //update
 			{
 				PreparedStatement ps_update = con.prepareStatement("UPDATE vertex_properties SET value = ? WHERE name = ? AND vertex_id = ?;");
-				ps_update.setString(1, value);
-				ps_update.setString(2, name);	
-				ps_update.setLong(3, vertex_id);
-				ps_update.execute();
-				ps_update.close();
+				try
+				{
+					ps_update.setString(1, value);
+					ps_update.setString(2, name);	
+					ps_update.setLong(3, vertex_id);
+					ps_update.execute();
+					
+				}
+				finally
+				{
+					ps_update.close();
+				}
 			}
 			else //insert
 			{
