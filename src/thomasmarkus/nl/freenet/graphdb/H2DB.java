@@ -553,7 +553,7 @@ public class H2DB {
 			}
 			if (limit != Integer.MAX_VALUE) queryString += " LIMIT "+limit+";";
 			
-			System.out.println(queryString);
+			//System.out.println(queryString);
 			
 			PreparedStatement ps = con.prepareStatement(queryString);
 			ResultSet results = ps.executeQuery();
