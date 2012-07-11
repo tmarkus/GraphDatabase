@@ -15,7 +15,11 @@ public class VertexIterator implements Iterator<Map<String, List<String>>> {
 	{
 		this.resultSet = resultSet;
 		this.hasNext = resultSet.next();
-		last_vertex = resultSet.getLong("vertex_id");
+
+		if (hasNext) //only assign field if we have at least one result in the resultSet
+		{
+			last_vertex = resultSet.getLong("vertex_id");	
+		}
 	}
 	
 	@Override
